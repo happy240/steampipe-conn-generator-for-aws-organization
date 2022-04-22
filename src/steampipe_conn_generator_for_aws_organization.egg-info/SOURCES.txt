@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+setup.cfg
+src/steampipe_conn_generator_for_aws_organization.egg-info/PKG-INFO
+src/steampipe_conn_generator_for_aws_organization.egg-info/SOURCES.txt
+src/steampipe_conn_generator_for_aws_organization.egg-info/dependency_links.txt
+src/steampipe_conn_generator_for_aws_organization.egg-info/top_level.txt
