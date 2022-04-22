@@ -9,7 +9,7 @@ License: UNKNOWN
 Project-URL: Bug Tracker, https://github.com/happy240/steampipe-conn-generator-for-aws-organization/issues
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
-Classifier: License :: OSI Approved :: GNU General Public License
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
