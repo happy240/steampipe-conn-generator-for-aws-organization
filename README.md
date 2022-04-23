@@ -6,6 +6,17 @@ in envs(using aws-vault is recommend), and base credential profile which can
 
 AssumeRole to accounts accross organization has been configured.
 
+## Permission requirement
+organization management account or an AWS service delegation administrator account: 
+https://docs.amazonaws.cn/en_us/organizations/latest/userguide/orgs_integrate_services_list.html
+https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
+
+Delegated administrator account and service infomation can be viewed through following command：
+```
+aws organizations list-delegated-administrators
+aws organizations list-delegated-services-for-account --account-id <account_id>
+```
+
 ## Install
 ```
 pip install genspc4awsorg
