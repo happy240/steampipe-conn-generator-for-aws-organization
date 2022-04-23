@@ -183,6 +183,6 @@ with open(steampipeinipath, 'r+') as configini:
     iniconf = configini.read()
     iniconf = re.sub(r'^([^\[|\n])',r'\t\1',iniconf,flags=re.M)
     iniconf = re.sub(r'^\n','}\n',iniconf,flags=re.M)
-    spcconf = re.sub(r'(^\[)([a-zA-Z0-9_ ]+)(]\n)',r'connection "\2" {\n',iniconf,flags=re.M)
+    spcconf = re.sub(r'(^\[)([a-zA-Z0-9_- ]+)(]\n)',r'connection "\2" {\n',iniconf,flags=re.M)
 with open(steampipespcpath, 'w') as configspc:
     configspc.write(spcconf)
