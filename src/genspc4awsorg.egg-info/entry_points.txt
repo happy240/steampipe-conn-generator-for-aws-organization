@@ -1,0 +1,2 @@
+[console_scripts]
+genspc4awsorg = genspc4awsorg.__main__:main

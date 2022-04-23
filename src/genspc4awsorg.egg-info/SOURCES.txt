@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+src/genspc4awsorg/__init__.py
+src/genspc4awsorg/__main__.py
+src/genspc4awsorg.egg-info/PKG-INFO
+src/genspc4awsorg.egg-info/SOURCES.txt
+src/genspc4awsorg.egg-info/dependency_links.txt
+src/genspc4awsorg.egg-info/entry_points.txt
+src/genspc4awsorg.egg-info/requires.txt
+src/genspc4awsorg.egg-info/top_level.txt
