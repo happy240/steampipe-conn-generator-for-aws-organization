@@ -118,14 +118,14 @@ def main():
     session=boto3.session.Session()
     client = boto3.client('organizations')
 
+    #遍历Organizatoin accounts
+    response = client.list_accounts()
+
     #~/.aws/config profiles
     if createawsconfigprofile:
         #读取aws config配置文件
         awsconfigpath = os.path.join(os.path.expanduser('~'), '.aws/config')
         cf.read(awsconfigpath)
-
-        #遍历Organizatoin accounts
-        response = client.list_accounts()
 
         #生成aws config配置文件条目
         for accountel in response['Accounts']:
