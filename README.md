@@ -1,12 +1,29 @@
-Generate steampipe connection file(.spc) for accounts and OUs in specified AWS
+# Steampipe connection configuration file generator for AWS accounts accross organization
 
-organization.Before run this script, please make sure correct AWS credential
+[Steampipe](https://github.com/turbot/steampipe) is an excellent utility which users can use SQL to instantly query your cloud services (AWS, Azure, GCP and more).
 
-in envs(using aws-vault is recommend), and base credential profile which can
+When use steampipe for AWS organization accounts at scale, [build connection configuration file](https://steampipe.io/docs/managing/connections) can be a complex and time consuming task. This python script generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization.
 
-AssumeRole to accounts accross organization has been configured.
+## Prerequisites:
+Before run this script, please make sure correct AWS credential in envs(using [aws-vault](https://github.com/99designs/aws-vault) is recommend), and base credential profile which can AssumeRole to accounts accross organization has been configured.
 
-## Permission requirement
+### Some template for ~/.aws/config:
+```
+[profile common]
+region = cn-north-1
+
+[profile <PROFILE NAME>]
+include_profile = common
+role_arn = arn:aws-cn:iam::<ACCOUNTID>:role/AdminRoleForFederatedUser
+```
+
+### Some template for ~/.aws/credentials:
+```
+[<PROFILE NAME>]
+credential_process = aws-vault exec -j <PROFILE NAME> --region=cn-north-1
+```
+
+### Permission requirement
 organization management account or an AWS service delegation administrator account: 
 https://docs.amazonaws.cn/en_us/organizations/latest/userguide/orgs_integrate_services_list.html
 https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
@@ -22,9 +39,13 @@ aws organizations list-delegated-services-for-account --account-id <account_id>
 pip install genspc4awsorg
 ```
 
+## How genspc4awsorg works
+This script will travers accounts and OUs accross AWS organization and generate an .spc file in ~/.steampipe/config/.
+There will be a connection for every account with name <PREFIX>_<ACCOUNT ID>, and a aggregator connection with name <PREFIX>_<OU NAME>.
+
 ## Usage
 ```
-genspc4awsorg.py \[-h\] \[-sp SOURCEPROFILE\] \[-mfa MFASERIAL\]
+genspc4awsorg \[-h\] \[-sp SOURCEPROFILE\] \[-mfa MFASERIAL\]
 
                         \[-r ROLENAME\] \[-nc\]
 
