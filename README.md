@@ -39,6 +39,11 @@ aws organizations list-delegated-services-for-account --account-id <account_id>
 pip install genspc4awsorg
 ```
 
+## Upgrade
+```
+pip install --upgrade genspc4awsorg
+```
+
 ## How genspc4awsorg works
 This script will travers accounts and OUs accross AWS organization and generate an .spc file in ~/.steampipe/config/.
 There will be a connection for every account with name rule '<PREFIX_ACCOUNT ID>', and a aggregator connection with name rule '<PREFIX_OU NAME>'.
