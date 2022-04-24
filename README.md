@@ -41,7 +41,7 @@ pip install genspc4awsorg
 
 ## How genspc4awsorg works
 This script will travers accounts and OUs accross AWS organization and generate an .spc file in ~/.steampipe/config/.
-There will be a connection for every account with name <PREFIX>_<ACCOUNT ID>, and a aggregator connection with name <PREFIX>_<OU NAME>.
+There will be a connection for every account with name rule '<PREFIX_ACCOUNT ID>', and a aggregator connection with name rule '<PREFIX_OU NAME>'.
 
 ## Usage
 ```
