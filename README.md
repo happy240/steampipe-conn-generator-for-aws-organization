@@ -24,7 +24,7 @@ credential_process = aws-vault exec -j <PROFILE NAME> --region=cn-north-1
 ```
 
 ### Permission requirement
-organization management account or an AWS service delegation administrator account: 
+genspc4awsorg need to call AWS organization APIs through organization management account or an AWS service delegation administrator account: 
 https://docs.amazonaws.cn/en_us/organizations/latest/userguide/orgs_integrate_services_list.html
 https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
 
@@ -42,6 +42,7 @@ pip install genspc4awsorg
 ## How genspc4awsorg works
 This script will travers accounts and OUs accross AWS organization and generate an .spc file in ~/.steampipe/config/.
 There will be a connection for every account with name rule '<PREFIX_ACCOUNT ID>', and a aggregator connection with name rule '<PREFIX_OU NAME>'.
+genspc4awsorg will create profiles in ~/.aws/config for every accounts by default, which can be used with awscli and other tools, this action can be ignored with -nc switch.
 
 ## Usage
 ```
