@@ -5,7 +5,7 @@
 When use steampipe for AWS organization accounts at scale, [build connection configuration file](https://steampipe.io/docs/managing/connections) can be a complex and time consuming task. This python script generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization.
 
 ## Prerequisites:
-Before run this script, please make sure correct AWS credential in envs(using [aws-vault](https://github.com/99designs/aws-vault) is recommend), and base credential profile which can AssumeRole to accounts accross organization has been configured.
+Genspc4awsorg script need to run under an account which has AWS organization APIs permissions, please make sure correct AWS credential in envs(using [aws-vault](https://github.com/99designs/aws-vault) to store and switch AWS credentials is recommend), and base credential profile which can AssumeRole to all accounts accross organization has been configured.
 
 ### Some template for ~/.aws/config:
 ```
