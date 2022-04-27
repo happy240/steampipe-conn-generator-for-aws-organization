@@ -242,5 +242,4 @@ def main():
     with open(steampipespcpath, 'w') as configspc:
         configspc.write(spcconf)
 
-if __name__ == "__main__":
-    sys.exit(main())
+main()

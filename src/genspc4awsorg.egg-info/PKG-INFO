@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: genspc4awsorg
-Version: 0.2.7
+Version: 0.3.0
 Summary: Generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization. Before run this script, please make sure correct AWS credential in envs(using aws-vault is recommend), and base credential profile which can AssumeRole to accounts accross organization has been configured.
 Home-page: https://github.com/happy240/steampipe-conn-generator-for-aws-organization
 Author: Henry Huo
@@ -54,6 +54,11 @@ aws organizations list-delegated-services-for-account --account-id <account_id>
 ## Install
 ```
 pip install genspc4awsorg
+```
+
+## Upgrade
+```
+pip install --upgrade genspc4awsorg
 ```
 
 ## How genspc4awsorg works
