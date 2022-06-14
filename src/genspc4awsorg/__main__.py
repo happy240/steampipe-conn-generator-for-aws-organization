@@ -9,7 +9,10 @@ def GenConfigProfile4Account(accountid):
     accountsection='profile '+orgprefix+'_'+accountid[-4:]
     if accountsection not in cf.sections():
         cf.add_section(accountsection)
-    cf.set(accountsection,'source_profile',sourceprofile)
+    if useec2role:
+        cf.set(accountsection,'credential_source','Ec2InstanceMetadata')
+    else:
+        cf.set(accountsection,'source_profile',sourceprofile)
     if mfa_serial!='':
         cf.set(accountsection,'mfa_serial',mfa_serial)
     cf.set(accountsection,'role_arn','arn:'+session.get_partition_for_region(session.region_name)+':iam::'+accountid+':role/'+rolename)
@@ -18,7 +21,8 @@ def GenCredentialsProfile4Account(accountid):
     sectionname=orgprefix+'_'+accountid
     if sectionname not in cf.sections():
         cf.add_section(sectionname)
-    cf.set(sectionname,'source_profile',orgprefix+'_base')
+    if not useec2role:
+        cf.set(sectionname,'source_profile',orgprefix+'_base')
     cf.set(sectionname,'role_arn','arn:'+session.get_partition_for_region(session.region_name)+':iam::'+accountid+':role/'+rolename)
 
 def GenSteampipeConnection4Account(accountid):
@@ -113,9 +117,10 @@ def main():
                         'if not provided, default to same value of $orgprefix.'+ \
                         'Ignored when use "--useec2role" option.')
     parser.add_argument('-mfa','--mfaserial', help='Mfa serial arn used to access target account.')
-    parser.add_argument('-ir','--useec2role', dest='useec2role', action='store_false', help='Use EC2 Instance Role credential instead of source profile.')
+    parser.add_argument('-ir','--useec2role', dest='useec2role', action='store_true', help='Use EC2 Instance Role credential instead of source profile.')
     parser.add_argument('-r','--rolename', help='Role name used to access target account. Default to "OrganizationAccountAccessRole"')
-    parser.add_argument('-nc','--ignoreconfigprofile', dest='createawsconfigprofile', action='store_false', help='Create steampipe connection config only, NO ~/.aws/config profiles.')
+    parser.add_argument('-nc','--ignoreconfigprofile', dest='createawsconfigprofile', action='store_true', help='Create steampipe connection config only, NO ~/.aws/config profiles.')
+    parser.set_defaults(useec2role=False)
     parser.set_defaults(createawsconfigprofile=True)
     args = parser.parse_args()
 
@@ -138,6 +143,7 @@ def main():
         rolename='OrganizationAccountAccessRole'
 
     createawsconfigprofile=args.createawsconfigprofile
+    useec2role=args.useec2role
     cf = configparser.ConfigParser()
 
     #~/.steampipe/config/<connection file>
@@ -183,9 +189,11 @@ def main():
         shutil.copyfile(awscredpath,awscredpath.replace('credentials','credentials.bak'))
     #读取aws credentials配置文件
     cf.read(awscredpath)
-    if orgprefix+'_base' not in cf.sections():
-        cf.add_section(orgprefix+'_base')
-    cf.set(orgprefix+'_base','credential_process','aws-vault exec -j '+sourceprofile+' --region='+session.region_name)
+    #不使用EC2 Role的情况下生成aws-vault基础credential
+    if not useec2role:
+        if orgprefix+'_base' not in cf.sections():
+            cf.add_section(orgprefix+'_base')
+        cf.set(orgprefix+'_base','credential_process','aws-vault exec -j '+sourceprofile+' --region='+session.region_name)
 
     #生成aws credentials配置文件条目
     for accountel in accountlist:

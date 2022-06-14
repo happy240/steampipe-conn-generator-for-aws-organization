@@ -51,42 +51,31 @@ genspc4awsorg will create profiles in ~/.aws/config for every accounts by defaul
 
 ## Usage
 ```
-genspc4awsorg \[-h\] \[-sp SOURCEPROFILE\] \[-mfa MFASERIAL\]
+genspc4awsorg [-h] [-sp SOURCEPROFILE] [-mfa MFASERIAL] [-ir] [-r ROLENAME] [-nc] orgprefix
 
-                        \[-r ROLENAME\] \[-nc\]
+Generate steampipe connection file(.spc) for accounts and OUs in specified AWS
+organization.Before run this script, please make sure correct AWS credential
+in envs(using aws-vault is recommend), and base credential profile which can
+AssumeRole to accounts accross organization has been configured.
 
-                        orgprefix
-```
 positional arguments:
-
-  orgprefix             Prefix for AWS organization, used in steampipe
-
-                        connection names.
+  orgprefix             Prefix for AWS organization, used in steampipe
+                        connection names.
 
 optional arguments:
-
-  -h, --help            show this help message and exit
-
-  -sp SOURCEPROFILE, --sourceprofile SOURCEPROFILE
-
-                        AWS credential profile(in ~/.aws/credentials) which
-
-                        can AssumeRole to accounts accross organization.if not
-
-                        provided, default to same value of $orgprefix
-
-  -mfa MFASERIAL, --mfaserial MFASERIAL
-
-                        Mfa serial arn used to access target account.
-
-  -r ROLENAME, --rolename ROLENAME
-
-                        Role name used to access target account. Default to
-
-                        "OrganizationAccountAccessRole"
-
-  -nc, --ignoreconfigprofile
-
-                        Create steampipe connection config only, NO
-
-                        ~/.aws/config profiles.
+  -h, --help            show this help message and exit
+  -sp SOURCEPROFILE, --sourceprofile SOURCEPROFILE
+                        AWS credential profile(in ~/.aws/credentials) which
+                        can AssumeRole to accounts accross organization.if not
+                        provided, default to same value of $orgprefix.Ignored
+                        when use "--useec2role" option.
+  -mfa MFASERIAL, --mfaserial MFASERIAL
+                        Mfa serial arn used to access target account.
+  -ir, --useec2role     Use EC2 Instance Role credential instead of source
+                        profile.
+  -r ROLENAME, --rolename ROLENAME
+                        Role name used to access target account. Default to
+                        "OrganizationAccountAccessRole"
+  -nc, --ignoreconfigprofile
+                        Create steampipe connection config only, NO
+                        ~/.aws/config profiles.
