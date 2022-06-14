@@ -1,13 +1,11 @@
 Metadata-Version: 2.1
 Name: genspc4awsorg
-Version: 0.3.0
+Version: 0.3.1
 Summary: Generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization. Before run this script, please make sure correct AWS credential in envs(using aws-vault is recommend), and base credential profile which can AssumeRole to accounts accross organization has been configured.
 Home-page: https://github.com/happy240/steampipe-conn-generator-for-aws-organization
 Author: Henry Huo
 Author-email: happy78@live.com
-License: UNKNOWN
 Project-URL: Bug Tracker, https://github.com/happy240/steampipe-conn-generator-for-aws-organization/issues
-Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
 Classifier: Operating System :: OS Independent
@@ -22,7 +20,7 @@ License-File: LICENSE
 When use steampipe for AWS organization accounts at scale, [build connection configuration file](https://steampipe.io/docs/managing/connections) can be a complex and time consuming task. This python script generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization.
 
 ## Prerequisites:
-Before run this script, please make sure correct AWS credential in envs(using [aws-vault](https://github.com/99designs/aws-vault) is recommend), and base credential profile which can AssumeRole to accounts accross organization has been configured.
+Genspc4awsorg script need to run under an account which has AWS organization APIs permissions, please make sure correct AWS credential in envs(using [aws-vault](https://github.com/99designs/aws-vault) to store and switch AWS credentials is recommend), and base credential profile which can AssumeRole to all accounts accross organization has been configured.
 
 ### Some template for ~/.aws/config:
 ```
@@ -107,4 +105,3 @@ optional arguments:
                         Create steampipe connection config only, NO
 
                         ~/.aws/config profiles.
-

@@ -1,6 +1,7 @@
 import boto3
 import configparser
 import os
+import shutil
 import argparse
 import re
 
@@ -101,6 +102,7 @@ def main():
     global parentlist
     global createawsconfigprofile
     global steampipeinipath
+    global useec2role
 
     # 创建 ArgumentParser 对象
     parser = argparse.ArgumentParser(description='Generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization.'+ \
@@ -108,8 +110,10 @@ def main():
                                     'and base credential profile which can AssumeRole to accounts accross organization has been configured.')
     parser.add_argument('orgprefix', help='Prefix for AWS organization, used in steampipe connection names.')
     parser.add_argument('-sp','--sourceprofile', help='AWS credential profile(in ~/.aws/credentials) which can AssumeRole to accounts accross organization.'+ \
-                        'if not provided, default to same value of $orgprefix')
+                        'if not provided, default to same value of $orgprefix.'+ \
+                        'Ignored when use "--useec2role" option.')
     parser.add_argument('-mfa','--mfaserial', help='Mfa serial arn used to access target account.')
+    parser.add_argument('-ir','--useec2role', dest='useec2role', action='store_false', help='Use EC2 Instance Role credential instead of source profile.')
     parser.add_argument('-r','--rolename', help='Role name used to access target account. Default to "OrganizationAccountAccessRole"')
     parser.add_argument('-nc','--ignoreconfigprofile', dest='createawsconfigprofile', action='store_false', help='Create steampipe connection config only, NO ~/.aws/config profiles.')
     parser.set_defaults(createawsconfigprofile=True)
@@ -160,6 +164,9 @@ def main():
     if createawsconfigprofile:
         #读取aws config配置文件
         awsconfigpath = os.path.join(os.path.expanduser('~'), '.aws/config')
+        #备份config file
+        if os.path.exists(awsconfigpath):
+            shutil.copyfile(awsconfigpath,awsconfigpath.replace('config','config.bak'))
         cf.read(awsconfigpath)
 
         #生成aws config配置文件条目
@@ -170,8 +177,11 @@ def main():
         cf = configparser.ConfigParser()
 
     #~/.aws/credentials
-    #读取aws credentials配置文件
     awscredpath = os.path.join(os.path.expanduser('~'), '.aws/credentials')
+    #备份credentials file
+    if os.path.exists(awscredpath):
+        shutil.copyfile(awscredpath,awscredpath.replace('credentials','credentials.bak'))
+    #读取aws credentials配置文件
     cf.read(awscredpath)
     if orgprefix+'_base' not in cf.sections():
         cf.add_section(orgprefix+'_base')
@@ -233,6 +243,9 @@ def main():
         cf.write(configini)
     cf = configparser.ConfigParser()
 
+    #备份spc配置
+    if os.path.exists(steampipespcpath):
+        shutil.copyfile(steampipespcpath,steampipespcpath.replace('.spc','.bak'))
     #Convert temp ini file to '.spc' file
     with open(steampipeinipath, 'r+') as configini:
         iniconf = configini.read()
