@@ -4,17 +4,26 @@ import os
 import shutil
 import argparse
 import re
+import sys
 
 def GenConfigProfile4Account(accountid):
     accountsection='profile '+orgprefix+'_'+accountid[-4:]
     if accountsection not in cf.sections():
         cf.add_section(accountsection)
+    cf.set(accountsection,'region',session.region_name)
     if useec2role:
         cf.set(accountsection,'credential_source','Ec2InstanceMetadata')
     else:
         cf.set(accountsection,'source_profile',sourceprofile)
+    cf.set(accountsection,'include_profile',sourceprofile)
     if mfa_serial!='':
         cf.set(accountsection,'mfa_serial',mfa_serial)
+    if source_identity!='':
+        cf.set(accountsection,'source_identity',source_identity)
+    if session_tags!='':
+        cf.set(accountsection,'session_tags',session_tags)
+    if transitive_session_tags!='':
+        cf.set(accountsection,'transitive_session_tags',transitive_session_tags)        
     cf.set(accountsection,'role_arn','arn:'+session.get_partition_for_region(session.region_name)+':iam::'+accountid+':role/'+rolename)
 
 def GenCredentialsProfile4Account(accountid):
@@ -107,6 +116,12 @@ def main():
     global createawsconfigprofile
     global steampipeinipath
     global useec2role
+    global source_identity
+    global session_tags
+    global transitive_session_tags
+    global profile
+
+    # 判断是否存圤.spc文件
 
     # 创建 ArgumentParser 对象
     parser = argparse.ArgumentParser(description='Generate steampipe connection file(.spc) for accounts and OUs in specified AWS organization.'+ \
@@ -120,6 +135,11 @@ def main():
     parser.add_argument('-ir','--useec2role', dest='useec2role', action='store_true', help='Use EC2 Instance Role credential instead of source profile.')
     parser.add_argument('-r','--rolename', help='Role name used to access target account. Default to "OrganizationAccountAccessRole"')
     parser.add_argument('-nc','--ignoreconfigprofile', dest='createawsconfigprofile', action='store_true', help='Create steampipe connection config only, NO ~/.aws/config profiles.')
+    parser.add_argument('-si','--source_identity', help='"source_identity" in ~/.aws/config profile.')
+    parser.add_argument('-st','--session_tags', help='"session_tags" in ~/.aws/config profile.')
+    parser.add_argument('-tst','--transitive_session_tags', help='"transit_session_tags" in ~/.aws/config profile.')
+    parser.add_argument('-ttl','--cache_ttl', help='Cache TTL in seconds. Default to 300.')
+    parser.add_argument('-p','--profile', help='Base profile used to get organization info.')
     parser.set_defaults(useec2role=False)
     parser.set_defaults(createawsconfigprofile=True)
     args = parser.parse_args()
@@ -142,6 +162,31 @@ def main():
     else:
         rolename='OrganizationAccountAccessRole'
 
+    if args.source_identity:
+        source_identity=args.source_identity
+    else:
+        source_identity=''
+
+    if args.session_tags:
+        session_tags=args.session_tags
+    else:
+        session_tags=''
+
+    if args.transitive_session_tags:
+        transitive_session_tags=args.transitive_session_tags
+    else:
+        transitive_session_tags=''
+
+    if args.cache_ttl:
+        cache_ttl=args.cache_ttl
+    else:
+        cache_ttl=300
+
+    if args.profile:
+        profile=args.profile
+    else:
+        profile=''
+
     createawsconfigprofile=args.createawsconfigprofile
     useec2role=args.useec2role
     cf = configparser.ConfigParser()
@@ -152,8 +197,11 @@ def main():
     steampipespcpath = os.path.join(os.path.expanduser('~'), '.steampipe/config/aws-'+orgprefix+'.spc')
 
     # Init boto3 client
-    session=boto3.session.Session()
-    client = boto3.client('organizations')
+    if profile!='':
+        session=boto3.Session(profile_name=profile)
+    else:
+        session=boto3.Session()
+    client = session.client('organizations')
 
     #遍历Organizatoin accounts
     accountlist=[]
@@ -260,6 +308,7 @@ def main():
         iniconf = re.sub(r'^([^\[|\n])',r'\t\1',iniconf,flags=re.M)
         iniconf = re.sub(r'^\n','}\n',iniconf,flags=re.M)
         spcconf = re.sub(r'(^\[)([a-zA-Z0-9_\- ]+)(]\n)',r'connection "\2" {\n',iniconf,flags=re.M)
+    spcconf = 'workspace "'+orgprefix+'" {\n\tmax_parallel = 5\n\tcache = true\n\tcache_ttl = '+str(cache_ttl)+'\n}\n'+spcconf
     with open(steampipespcpath, 'w') as configspc:
         configspc.write(spcconf)
 

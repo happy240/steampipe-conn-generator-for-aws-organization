@@ -1,1 +1,7 @@
-/dist
+build/
+dist/
+test/
+.tox/
+__pycache__/
+*.egg-info/
+*.py[cod]
